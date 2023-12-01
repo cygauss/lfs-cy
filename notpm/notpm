@@ -1,0 +1,11 @@
+set NOT_PWD=$PWD
+set NOT_OLDPWD=$OLDPWD
+pwd
+cd $NOT_SOURCES
+tar xpvf $@*.tar.*
+cd $@*/
+bash ../$@.$NOT_DIF.sh
+cd -
+rm $@*/ -rf
+cd $NOT_OLDPWD
+cd $NOT_PWD
