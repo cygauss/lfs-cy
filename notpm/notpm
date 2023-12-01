@@ -3,6 +3,7 @@ set NOT_OLDPWD=$OLDPWD
 cd $NOT_SOURCES
 tar xpvf $@*.tar.*
 cd $@*/
+#$NOT_DIFcould be num(time) way etc.
 bash ../$@.$NOT_DIF.sh
 cd -
 rm $@*/ -rf
