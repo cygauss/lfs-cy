@@ -1,4 +1,4 @@
 make mrproper
-make headers #ARCH=loongarch
+make headers
 find usr/include -type f ! -name '*.h' -delete
-cp -rv usr/include $CLFS/usr
+cp -rv usr/include $LFS/usr
