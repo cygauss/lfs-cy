@@ -1,13 +1,8 @@
-su - root <<EOF
-#112358
 export LFS=/mnt/lfs
-#mkfs.fat -F 32 /dev/nvme0n1p3
 #mkfs.ext4 /dev/nvme0n1p4
 #mount /dev/nvme0n1p4 $LFS
 mkdir -v $LFS/sources
-curl -O c.cygauss.eu.org/12.0.tar.xz
-tar xvf 12.0*
-cp 12.0/* $LFS/sources
+＃
 chmod -v a+wt $LFS/sources
 chown root:root $LFS/sources/*
 mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin}
@@ -22,18 +17,18 @@ esac
 mkdir -pv $LFS/tools
 groupadd lfs
 useradd -s /bin/bash -g lfs -m -k /dev/null lfs
-echo "lfs:112358" > chpasswd
 chown -v lfs $LFS/{usr{,/*},lib,var,etc,bin,sbin,tools}
 case $(uname -m) in
   x86_64) chown -v lfs $LFS/lib64 ;;
 esac
 
 
-su - lfs <<E1OF
-cat > ~/.bash_profile << "E2OF"
+su - lfs << "END"
+cat > ~/.bash_profile << "EOF"
 exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash
-E2OF
-cat > ~/.bashrc << "E3OF"
+EOF
+
+cat > ~/.bashrc << "EOF"
 set +h
 umask 022
 LFS=/mnt/lfs
@@ -44,9 +39,13 @@ if [ ! -L /bin ]; then PATH=/bin:$PATH; fi
 PATH=$LFS/tools/bin:$PATH
 CONFIG_SITE=$LFS/usr/share/config.site
 export LFS LC_ALL LFS_TGT PATH CONFIG_SITE
-E3OF
+EOF
+END
+
 [ ! -e /etc/bash.bashrc ] || mv -v /etc/bash.bashrc /etc/bash.bashrc.NOUSE
-source ~/.bash_profile
+
+su - lfs << "END"
+. ~/.bashrc
 export MAKEFLAGS='-j8'
 export NOT_SOURCES="/mnt/lfs/sources"
 NOT_DIF=".cc"  bash /mnt/lfs/sources/notpm binutils
@@ -72,7 +71,8 @@ bash /mnt/lfs/sources/notpm tar
 bash /mnt/lfs/sources/notpm xz
 bash /mnt/lfs/sources/notpm binutils
 bash /mnt/lfs/sources/notpm gcc
-E1OF
+END
+
 chown -R root:root $LFS/{usr,lib,var,etc,bin,sbin,tools}
 case $(uname -m) in
   x86_64) chown -R root:root $LFS/lib64 ;;
@@ -88,12 +88,13 @@ if [ -h $LFS/dev/shm ]; then
 else
   mount -t tmpfs -o nosuid,nodev tmpfs $LFS/dev/shm
 fi
+
 chroot "$LFS" /usr/bin/env -i   \
     HOME=/root                  \
     TERM="$TERM"                \
     PS1='(lfs chroot) \u:\w\$ ' \
     PATH=/usr/bin:/usr/sbin     \
-    /bin/bash --login <<E4OF
+    /bin/bash --login << END
 mkdir -pv /{boot,home,mnt,opt,srv}
 mkdir -pv /etc/{opt,sysconfig}
 mkdir -pv /lib/firmware
@@ -105,26 +106,27 @@ mkdir -pv /usr/{,local/}share/{misc,terminfo,zoneinfo}
 mkdir -pv /usr/{,local/}share/man/man{1..8}
 mkdir -pv /var/{cache,local,log,mail,opt,spool}
 mkdir -pv /var/lib/{color,misc,locate}
-
 ln -sfv /run /var/run
 ln -sfv /run/lock /var/lock
-
 install -dv -m 0750 /root
 install -dv -m 1777 /tmp /var/tmp
 ln -sv /proc/self/mounts /etc/mtab
-cat > /etc/hosts << E5OF
+
+cat > /etc/hosts << EOF
 127.0.0.1  localhost $(hostname)
 ::1        localhost
-E5OF
-cat > /etc/passwd << "E6OF"
+EOF
+
+cat > /etc/passwd << EOF
 root:x:0:0:root:/root:/bin/bash
 bin:x:1:1:bin:/dev/null:/usr/bin/false
 daemon:x:6:6:Daemon User:/dev/null:/usr/bin/false
 messagebus:x:18:18:D-Bus Message Daemon User:/run/dbus:/usr/bin/false
 uuidd:x:80:80:UUID Generation Daemon User:/dev/null:/usr/bin/false
 nobody:x:65534:65534:Unprivileged User:/dev/null:/usr/bin/false
-E6OF
-cat > /etc/group << "E7OF"
+EOF
+
+cat > /etc/group << EOF
 root:x:0:
 bin:x:1:daemon
 sys:x:2:
@@ -150,7 +152,8 @@ uuidd:x:80:
 wheel:x:97:
 users:x:999:
 nogroup:x:65534:
-E7OF
+EOF
+
 echo "tester:x:101:101::/home/tester:/bin/bash" >> /etc/passwd
 echo "tester:x:101:" >> /etc/group
 install -o tester -d /home/tester
@@ -171,10 +174,11 @@ bash /sources/notpm util-linux
 rm -rf /usr/share/{info,man,doc}/*
 find /usr/{lib,libexec} -name \*.la -delete
 rm -rf /tools
-E4OF
+
+END
+
 mountpoint -q $LFS/dev/shm && umount $LFS/dev/shm
 umount $LFS/dev/pts
 umount $LFS/{sys,proc,run,dev}
 cd $LFS
 tar -cJpf $HOME/lfs-temp-tools-12.0.tar.xz .
-EOF
