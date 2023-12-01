@@ -1,0 +1,31 @@
+
+    NOT_binutils-2.41 - 第一遍
+    gcc-13.2.0 - 第一遍
+    linux-6.4.12 api 头文件
+    glibc-2.38
+    gcc-13.2.0 中的 libstdc++
+    m4-1.4.19
+    ncurses-6.4
+    bash-5.2.15
+    coreutils-9.3
+    diffutils-3.10
+    file-5.45
+    findutils-4.9.0
+    gawk-5.2.2
+    grep-3.11
+    gzip-1.12
+    make-4.4.1
+    patch-2.7.6
+    sed-4.9
+    tar-1.35
+    xz-5.4.4
+    binutils-2.41 - 第二遍
+    gcc-13.2.0 - 第二遍
+
+
+    gettext-0.22
+    bison-3.8.2
+    perl-5.38.0
+    python-3.11.4
+    texinfo-7.0.3
+    util-linux-2.39.1 
