@@ -1,10 +1,10 @@
-set NOT_PWD=$PWD
-set NOT_OLDPWD=$OLDPWD
+export NOT_PWD=$PWD
+export  NOT_OLDPWD=$OLDPWD
 cd $NOT_SOURCES
-tar xpvf $@*.tar.*
+tar xvf $@*.tar.*
 cd $@*/
 #$NOT_DIFcould be num(time) way etc.
-bash ../$@.$NOT_DIF.sh
+bash ../$@.sh$NOT_DIF
 cd -
 rm $@*/ -rf
 cd $NOT_OLDPWD
