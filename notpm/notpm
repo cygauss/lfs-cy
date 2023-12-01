@@ -1,6 +1,5 @@
 set NOT_PWD=$PWD
 set NOT_OLDPWD=$OLDPWD
-pwd
 cd $NOT_SOURCES
 tar xpvf $@*.tar.*
 cd $@*/
