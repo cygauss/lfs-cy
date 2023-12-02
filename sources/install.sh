@@ -92,7 +92,7 @@ rm version-check.sh
 fi
 
 read -p "LFS_FLAGS=" j
-read -p "the disk part for lfs: /dev/" d
+read -p "the partition for lfs(none put to none mounted): " d
 read -p "the dir of sources(don't put / at end): " s
 read -p "1.continue 2.exit: " i
 if [ $i -eq 2 ];then
@@ -100,8 +100,14 @@ exit
 fi
 
 export LFS=/mnt/lfs
-mkfs.ext4 /dev/$d
-mount /dev/$d $LFS
+mkdir $LFS
+
+if [];then
+else
+mkfs.ext4 $d
+mount $d $LFS
+fi
+
 mkdir -pv $LFS/sources
 cp $s/* $LFS/sources
 echo $j > $LFS/sources/env
@@ -289,5 +295,9 @@ umount $LFS/dev/pts
 umount $LFS/{sys,proc,run,dev}
 cd $LFS
 tar -cJpf $HOME/lfs-temp-tools-12.0.tar.xz .
+if [];then
+else
 umount $LFS
+fi
 #user del
+[ ! -e /etc/bash.bashrc.NOUSE ] || mv -v /etc/bash.bashrc.NOUSE /etc/bash.bashrc
