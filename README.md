@@ -1,3 +1,3 @@
-# lfs-cy
+# lfs-12.0
 
-/notpm notpm is not package manager
+隐藏mkfs交互，测试不mount编译
