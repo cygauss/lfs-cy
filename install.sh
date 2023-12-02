@@ -1,3 +1,6 @@
+read -p "1.check host 2.pass: " v
+
+if [ $v -eq 1 ];then
 cat > version-check.sh << "EOF"
 #!/bin/bash
 # A script to list version numbers of critical development tools
@@ -16,14 +19,14 @@ sort   /dev/null || bail "sort does not work"
 ver_check()
 {
    if ! type -p $2 &>/dev/null
-   then 
+   then
      echo "ERROR: Cannot find $2 ($1)"; return 1; 
    fi
    v=$($2 --version 2>&1 | grep -E -o '[0-9]+\.[0-9\.]+[a-z]*' | head -n1)
    if printf '%s\n' $3 $v | sort --version-sort --check &>/dev/null
-   then 
+   then
      printf "OK:    %-9s %-6s >= $3\n" "$1" "$v"; return 0;
-   else 
+   else
      printf "ERROR: %-9s is TOO OLD ($3 or later required)\n" "$1"; 
      return 1; 
    fi
@@ -84,25 +87,24 @@ then echo "OK:    g++ works";
 else echo "ERROR: g++ does NOT work"; fi
 rm -f a.out
 EOF
-
 bash version-check.sh
 rm version-check.sh
+fi
 
 read -p "LFS_FLAGS=" j
 read -p "the disk part for lfs: /dev/" d
-
-read -p "1.Continue 2.Exit(!!!move sources/ to /root/!!!): " i
+read -p "the dir of sources(don't put / at end): " s
+read -p "1.continue 2.exit: " i
 if [ $i -eq 2 ];then
 exit
 fi
-
 export LFS=/mnt/lfs
 umount /mnt/lfs
 umount /mnt
 mkfs.ext4 /dev/$d
 mount /dev/$d $LFS
 mkdir -v $LFS/sources
-cp /root/sources/* $LFS/sources
+cp $s/* $LFS/sources
 echo $j > $LFS/sources/env
 chmod -v a+wt $LFS/sources
 chown root:root $LFS/sources/*
