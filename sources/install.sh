@@ -98,12 +98,13 @@ read -p "1.continue 2.exit: " i
 if [ $i -eq 2 ];then
 exit
 fi
+
 export LFS=/mnt/lfs
 umount /mnt/lfs
 umount /mnt
 mkfs.ext4 /dev/$d
 mount /dev/$d $LFS
-mkdir -v $LFS/sources
+mkdir -pv $LFS/sources
 cp $s/* $LFS/sources
 echo $j > $LFS/sources/env
 chmod -v a+wt $LFS/sources
