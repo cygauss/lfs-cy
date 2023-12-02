@@ -100,8 +100,6 @@ exit
 fi
 
 export LFS=/mnt/lfs
-umount /mnt/lfs
-umount /mnt
 mkfs.ext4 /dev/$d
 mount /dev/$d $LFS
 mkdir -pv $LFS/sources
