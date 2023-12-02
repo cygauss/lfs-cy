@@ -102,7 +102,7 @@ fi
 export LFS=/mnt/lfs
 mkdir $LFS
 
-if [];then
+if [ -z "$d" ];then
 else
 mkfs.ext4 $d
 mount $d $LFS
@@ -295,9 +295,5 @@ umount $LFS/dev/pts
 umount $LFS/{sys,proc,run,dev}
 cd $LFS
 tar -cJpf $HOME/lfs-temp-tools-12.0.tar.xz .
-if [];then
-else
-umount $LFS
-fi
 #user del
 [ ! -e /etc/bash.bashrc.NOUSE ] || mv -v /etc/bash.bashrc.NOUSE /etc/bash.bashrc
