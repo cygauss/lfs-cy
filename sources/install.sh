@@ -295,5 +295,6 @@ umount $LFS/dev/pts
 umount $LFS/{sys,proc,run,dev}
 cd $LFS
 tar -cJpf $HOME/lfs-temp-tools-12.0.tar.xz .
-#user del
+userdel -r lfs
+umount $LFS
 [ ! -e /etc/bash.bashrc.NOUSE ] || mv -v /etc/bash.bashrc.NOUSE /etc/bash.bashrc
