@@ -1,8 +1,10 @@
 export LFS=/mnt/lfs
-#mkfs.ext4 /dev/nvme0n1p4
-#mount /dev/nvme0n1p4 $LFS
+mkfs.ext4 /dev/nvme0n1p4
+mount /dev/nvme0n1p4 $LFS
 mkdir -v $LFS/sources
-＃
+#rem to add file to sources 
+cp /root/* /mnt/lfs/sources
+
 chmod -v a+wt $LFS/sources
 chown root:root $LFS/sources/*
 mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin}
@@ -22,8 +24,11 @@ case $(uname -m) in
   x86_64) chown -v lfs $LFS/lib64 ;;
 esac
 
+#only part changed, seleted in OVER
+[ ! -e /etc/bash.bashrc ] || mv -v /etc/bash.bashrc /etc/bash.bashrc.NOUSE
 
 su - lfs << "END"
+
 cat > ~/.bash_profile << "EOF"
 exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash
 EOF
@@ -38,22 +43,18 @@ PATH=/usr/bin
 if [ ! -L /bin ]; then PATH=/bin:$PATH; fi
 PATH=$LFS/tools/bin:$PATH
 CONFIG_SITE=$LFS/usr/share/config.site
-export LFS LC_ALL LFS_TGT PATH CONFIG_SITE
+#MAKEFLAGS='-j24'
+NOT_SOURCES="/mnt/lfs/sources"
+export LFS LC_ALL LFS_TGT PATH CONFIG_SITE MAKEFLAGS NOT_SOURCES
 EOF
-END
-
-[ ! -e /etc/bash.bashrc ] || mv -v /etc/bash.bashrc /etc/bash.bashrc.NOUSE
-
-su - lfs << "END"
+. ~/.bash_profile
 . ~/.bashrc
-export MAKEFLAGS='-j8'
-export NOT_SOURCES="/mnt/lfs/sources"
 NOT_DIF=".cc"  bash /mnt/lfs/sources/notpm binutils
 NOT_DIF=".cc"  bash /mnt/lfs/sources/notpm gcc
 NOT_DIF=".cc-headers" bash /mnt/lfs/sources/notpm linux
 NOT_DIF=".cc"  bash /mnt/lfs/sources/notpm glibc
 NOT_DIF=".cc-libstdc++"  bash /mnt/lfs/sources/notpm gcc
-export NOT_DIF=".tt" 
+export NOT_DIF=".tt"
 bash /mnt/lfs/sources/notpm m4
 bash /mnt/lfs/sources/notpm ncurses
 bash /mnt/lfs/sources/notpm bash
@@ -71,6 +72,7 @@ bash /mnt/lfs/sources/notpm tar
 bash /mnt/lfs/sources/notpm xz
 bash /mnt/lfs/sources/notpm binutils
 bash /mnt/lfs/sources/notpm gcc
+
 END
 
 chown -R root:root $LFS/{usr,lib,var,etc,bin,sbin,tools}
@@ -94,7 +96,11 @@ chroot "$LFS" /usr/bin/env -i   \
     TERM="$TERM"                \
     PS1='(lfs chroot) \u:\w\$ ' \
     PATH=/usr/bin:/usr/sbin     \
-    /bin/bash --login << END
+   #MAKEFLAGES="-j24"           \
+    NOT_DIF=".tt"               \
+    NOT_SOURCES="sources"       \
+   /bin/bash --login << END
+#OVER
 mkdir -pv /{boot,home,mnt,opt,srv}
 mkdir -pv /etc/{opt,sysconfig}
 mkdir -pv /lib/firmware
@@ -162,9 +168,7 @@ touch /var/log/{btmp,lastlog,faillog,wtmp}
 chgrp -v utmp /var/log/lastlog
 chmod -v 664  /var/log/lastlog
 chmod -v 600  /var/log/btmp
-export MAKEFLAGES="-j8" 
-export NOT_DIF=".tt" 
-export NOT_SOURCES="sources" 
+# env is above
 bash /sources/notpm gettext
 bash /sources/notpm bison
 bash /sources/notpm perl
