@@ -89,19 +89,20 @@ bash version-check.sh
 rm version-check.sh
 
 read -p "LFS_FLAGS=" j
-read -p "the disk part for lfs: /dev/" d 
+read -p "the disk part for lfs: /dev/" d
 
-read -p "1.Continue 2.exit: " i
+read -p "1.Continue 2.Exit(!!!move sources/ to /root/!!!): " i
 if [ $i -eq 2 ];then
 exit
 fi
 
 export LFS=/mnt/lfs
-umount /mnt -R
+umount /mnt/lfs
+umount /mnt
 mkfs.ext4 /dev/$d
 mount /dev/$d $LFS
 mkdir -v $LFS/sources
-cp /root/* $LFS/sources
+cp /root/sources/* $LFS/sources
 echo $j > $LFS/sources/env
 chmod -v a+wt $LFS/sources
 chown root:root $LFS/sources/*
