@@ -1,3 +1,4 @@
+
 read -p "1.check host 2.pass: " v
 
 if [ $v -eq 1 ];then
