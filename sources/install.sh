@@ -126,6 +126,7 @@ esac
 mkdir -pv $LFS/tools
 groupadd lfs
 useradd -s /bin/bash -g lfs -m -k /dev/null lfs
+#echo "lfs:112358" | chpasswd
 chown -v lfs $LFS/{usr{,/*},lib,var,etc,bin,sbin,tools}
 case $(uname -m) in
   x86_64) chown -v lfs $LFS/lib64 ;;
@@ -204,11 +205,10 @@ chroot "$LFS" /usr/bin/env -i   \
     TERM="$TERM"                \
     PS1='(lfs chroot) \u:\w\$ ' \
     PATH=/usr/bin:/usr/sbin     \
-    MAKEFLAGS='-j$j'            \
+    MAKEFLAGS=$(cat /mnt/lfs/sources/makeflags) \
     NOT_DIF=.tt                 \
-    NOT_SOURCES=sources         \
+    NOT_SOURCES=/sources         \
    /bin/bash --login << "END"
-#OVER
 
 mkdir -pv /{boot,home,mnt,opt,srv}
 mkdir -pv /etc/{opt,sysconfig}
