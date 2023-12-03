@@ -1,5 +1,4 @@
 read -p "1.check host 2.pass: " v
-
 if [ $v -eq 1 ];then
 cat > version-check.sh << "EOF"
 #!/bin/bash
@@ -95,6 +94,7 @@ read -p "MAKEFLAGS=-j" j
 read -p "the partition for lfs(none put to none mounted): " d
 read -p "the dir of sources(don't put / at end): " s
 read -p "1.continue 2.exit: " i
+
 if [ $i -eq 2 ];then
 exit
 fi
@@ -102,8 +102,7 @@ fi
 export LFS=/mnt/lfs
 mkdir $LFS
 
-if [ -z "$d" ];then
-else
+if [ ! -z "$d" ];then
 mkfs.ext4 $d << "EOF"
 y
 EOF
@@ -150,7 +149,7 @@ PATH=/usr/bin
 if [ ! -L /bin ]; then PATH=/bin:$PATH; fi
 PATH=$LFS/tools/bin:$PATH
 CONFIG_SITE=$LFS/usr/share/config.site
-MAKEFLAGS='$(cat /mnt/lfs/sources/makeflags)'
+MAKEFLAGS=$(cat /mnt/lfs/sources/makeflags)
 NOT_SOURCES=/mnt/lfs/sources
 export LFS LC_ALL LFS_TGT PATH CONFIG_SITE MAKEFLAGS NOT_SOURCES
 EOF
