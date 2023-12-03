@@ -91,7 +91,7 @@ bash version-check.sh
 rm version-check.sh
 fi
 
-read -p "LFS_FLAGS=" j
+read -p "MAKEFLAGS=-j" j
 read -p "the partition for lfs(none put to none mounted): " d
 read -p "the dir of sources(don't put / at end): " s
 read -p "1.continue 2.exit: " i
@@ -112,7 +112,7 @@ fi
 
 mkdir -pv $LFS/sources
 cp $s/* $LFS/sources
-echo $j > $LFS/sources/env
+echo -j$j > $LFS/sources/makeflags
 chmod -v a+wt $LFS/sources
 chown root:root $LFS/sources/*
 mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin}
@@ -150,7 +150,7 @@ PATH=/usr/bin
 if [ ! -L /bin ]; then PATH=/bin:$PATH; fi
 PATH=$LFS/tools/bin:$PATH
 CONFIG_SITE=$LFS/usr/share/config.site
-MAKEFLAGS=$(cat /mnt/lfs/sources/env)
+MAKEFLAGS='$(cat /mnt/lfs/sources/makeflags)'
 NOT_SOURCES=/mnt/lfs/sources
 export LFS LC_ALL LFS_TGT PATH CONFIG_SITE MAKEFLAGS NOT_SOURCES
 EOF
@@ -205,7 +205,7 @@ chroot "$LFS" /usr/bin/env -i   \
     TERM="$TERM"                \
     PS1='(lfs chroot) \u:\w\$ ' \
     PATH=/usr/bin:/usr/sbin     \
-    MAKEFLAGES=$(cat /mnt/lfs/sources/env)   \
+    MAKEFLAGS='-j$j'            \
     NOT_DIF=.tt                 \
     NOT_SOURCES=sources         \
    /bin/bash --login << "END"
@@ -290,12 +290,12 @@ find /usr/{lib,libexec} -name \*.la -delete
 rm -rf /tools
 
 END
-
+rm $LFS/sources/makeflags
 mountpoint -q $LFS/dev/shm && umount $LFS/dev/shm
 umount $LFS/dev/pts
 umount $LFS/{sys,proc,run,dev}
 cd $LFS
-tar -cJpf $HOME/lfs-temp-tools-12.0.tar.xz .
+tar -cf $HOME/lfs-temp-tools-12.0.tar .
 userdel -r lfs
 
 if [ -z "$d" ];then
@@ -307,4 +307,5 @@ EOF
 fi
 
 [ ! -e /etc/bash.bashrc.NOUSE ] || mv -v /etc/bash.bashrc.NOUSE /etc/bash.bashrc
-#. ~/.bash_profile
+
+echo "rem to relogin"
