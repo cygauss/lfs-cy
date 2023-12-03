@@ -305,7 +305,7 @@ mkfs.ext4 $d << "EOF"
 y
 EOF
 fi
-
+rm -fr $LFS
 [ ! -e /etc/bash.bashrc.NOUSE ] || mv -v /etc/bash.bashrc.NOUSE /etc/bash.bashrc
 
 echo "rem to relogin"
