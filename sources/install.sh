@@ -104,7 +104,9 @@ mkdir $LFS
 
 if [ -z "$d" ];then
 else
-mkfs.ext4 $d
+mkfs.ext4 $d << "EOF"
+y
+EOF
 mount $d $LFS
 fi
 
@@ -130,7 +132,6 @@ case $(uname -m) in
   x86_64) chown -v lfs $LFS/lib64 ;;
 esac
 
-#only part changed, seleted in OVER ,!!!edit 2 makeflags!!!
 [ ! -e /etc/bash.bashrc ] || mv -v /etc/bash.bashrc /etc/bash.bashrc.NOUSE
 
 su - lfs  << "END"
@@ -296,5 +297,14 @@ umount $LFS/{sys,proc,run,dev}
 cd $LFS
 tar -cJpf $HOME/lfs-temp-tools-12.0.tar.xz .
 userdel -r lfs
-umount $LFS
+
+if [ -z "$d" ];then
+else
+umount $d $LFS
+mkfs.ext4 $d << "EOF"
+y
+EOF
+fi
+
 [ ! -e /etc/bash.bashrc.NOUSE ] || mv -v /etc/bash.bashrc.NOUSE /etc/bash.bashrc
+#. ~/.bash_profile
