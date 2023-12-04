@@ -1,0 +1,10 @@
+sed -i '/Error loading kernel symbols/{n;n;d}' ksym_mod.c
+sed -i 's/union wait/int/' syslogd.c
+编译该软件包：
+
+make
+该软件包不包含测试套件。
+
+安装该软件包：
+
+make BINDIR=/sbin install
