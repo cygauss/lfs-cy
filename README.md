@@ -1,3 +1,5 @@
 # lfs-cy
 
-/notpm notpm is not package manager
+不分区编译 是否添加交互
+完成lfs
+clfs
