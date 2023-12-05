@@ -1,7 +1,5 @@
 mkdir -v build
 cd       build
-准备编译 Binutils：
-
 ../configure --prefix=/usr       \
              --sysconfdir=/etc   \
              --enable-gold       \
@@ -14,5 +12,6 @@ cd       build
              make tooldir=/usr
              make -k check
 grep '^FAIL:' $(find -name '*.log')
+
 make tooldir=/usr install
 rm -fv /usr/lib/lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a
