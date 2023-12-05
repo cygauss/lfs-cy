@@ -20,4 +20,3 @@ done
 rm -vf                     /usr/lib/libcursesw.so
 echo "INPUT(-lncursesw)" > /usr/lib/libcursesw.so
 ln -sfv libncurses.so      /usr/lib/libcurses.so
-cp -v -R doc -T /usr/share/doc/ncurses-6.4
