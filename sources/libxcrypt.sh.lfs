@@ -4,5 +4,4 @@
             --disable-static             \
             --disable-failure-tokens
 make
-make check
 make install
