@@ -12,6 +12,8 @@ cd       build
              make tooldir=/usr
              make -k check
 grep '^FAIL:' $(find -name '*.log')
-
+read -p "press 1 if OK: " c
+if [ $c -eq 1 ];then
 make tooldir=/usr install
 rm -fv /usr/lib/lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a
+fi
