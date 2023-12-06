@@ -15,6 +15,5 @@ sh Configure -des                                         \
              -Duseshrplib                                 \
              -Dusethreads
              make
-make test
 make install
 unset BUILD_ZLIB BUILD_BZIP2
