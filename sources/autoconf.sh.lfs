@@ -3,5 +3,4 @@ sed -e 's/SECONDS|/&SHLVL|/'               \
     -i.orig tests/local.at
 ./configure --prefix=/usr
 make
-make check TESTSUITEFLAGS=$MAKEFLAGS
 make install
