@@ -1,3 +1,4 @@
+#pkgconf
 mkdir -v build
 cd       build
 ../configure --prefix=/usr           \
