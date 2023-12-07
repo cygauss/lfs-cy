@@ -4,4 +4,3 @@
             --docdir=/usr/share/doc/bash-5.2.15
             make
 make install
-exec /usr/bin/bash --login
