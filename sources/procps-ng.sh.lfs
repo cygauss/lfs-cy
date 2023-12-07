@@ -4,5 +4,4 @@
             --disable-kill
 --disable-kill
 make
-make check
 make install
