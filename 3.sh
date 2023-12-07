@@ -100,6 +100,10 @@ bash /sources/notpm util-linux
 bash /sources/notpm e2fsprogs
 bash /sources/notpm sysklogd
 bash /sources/notpm sysvinit
+rm -rf /tmp/*
+find /usr/lib /usr/libexec -name \*.la -delete
+find /usr -depth -name $(uname -m)-lfs-linux-gnu\* | xargs rm -rf
 bash /sources/notpm lfs-bootscripts
+bash /usr/lib/udev/init-net-rules.sh
 EOF
 END
