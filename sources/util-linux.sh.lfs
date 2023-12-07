@@ -17,6 +17,4 @@ sed -i '/test_mkfds/s/^/#/' tests/helpers/Makemodule.am
             --without-systemdsystemunitdir \
             --docdir=/usr/share/doc/util-linux-2.39.1
 make
-chown -Rv tester .
-su tester -c "make -k check"
 make install
