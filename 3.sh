@@ -1,6 +1,23 @@
 export MAKEFLAGS='-j16'
-export NOT_SOURCES=/sources
-export NOT_DIF=".lfs"
+mount -v --bind /dev $@/dev
+mount -v --bind /dev/pts $@/dev/pts
+mount -vt proc proc $@/proc
+mount -vt sysfs sysfs $@/sys
+mount -vt tmpfs tmpfs $@/run
+if [ -h $LFS/dev/shm ]; then
+  mkdir -pv $@/$(readlink $LFS/dev/shm)
+else
+  mount -t tmpfs -o nosuid,nodev tmpfs $@/dev/shm
+fi
+chroot "$@" /usr/bin/env -i     \
+    HOME=/root                  \
+    TERM="$TERM"                \
+    PS1='(lfs chroot) \u:\w\$ ' \
+    PATH=/usr/bin:/usr/sbin     \
+    MAKEFLAGS=$MAKEFLAGS        \
+    NOT_SOURCES=/sources        \
+    NOT_DIF=".lfs"              \
+    /bin/bash --login << "END"
 bash /sources/notpm man-pages
 bash /sources/notpm iana-etc
 bash /sources/notpm glibc
@@ -85,3 +102,4 @@ bash /sources/notpm sysklogd
 bash /sources/notpm sysvinit
 bash /sources/notpm lfs-bootscripts
 EOF
+END
