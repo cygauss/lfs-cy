@@ -9,5 +9,4 @@
             --with-systemdtmpfilesdir=            \
             --with-systemdsystemunitdir=
             make
-make -k check
 make install
