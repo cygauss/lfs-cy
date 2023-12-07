@@ -76,7 +76,7 @@ bash /sources/notpm tar
 bash /sources/notpm texinfo
 bash /sources/notpm MarkupSafe
 bash /sources/notpm Jinja2
-NOT_DIF=".lfs-udev" bash /sources/notpm systemd
+NOT_DIF=".lfs-udev" bash /sources/notpm Systemd
 bash /sources/notpm man-db
 bash /sources/notpm procps-ng
 bash /sources/notpm util-linux
