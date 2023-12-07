@@ -34,6 +34,7 @@ bash /sources/notpm gettext
 bash /sources/notpm bison
 bash /sources/notpm grep
 bash /sources/notpm bash
+exec /usr/bin/bash --login << "EOF"
 bash /sources/notpm libtool
 bash /sources/notpm gdbm
 bash /sources/notpm gperf
@@ -83,3 +84,4 @@ bash /sources/notpm e2fsprogs
 bash /sources/notpm sysklogd
 bash /sources/notpm sysvinit
 bash /sources/notpm lfs-bootscripts
+EOF
