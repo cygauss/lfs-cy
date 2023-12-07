@@ -47,7 +47,7 @@ bash /sources/notpm autoconf
 bash /sources/notpm automake
 bash /sources/notpm openssl
 bash /sources/notpm kmod
-bash /sources/notpm elfutils
+NOT_DIF=".lfs-libelf" bash /sources/notpm elfutils
 bash /sources/notpm libffi
 bash /sources/notpm Python
 bash /sources/notpm flit_core
@@ -75,7 +75,7 @@ bash /sources/notpm tar
 bash /sources/notpm texinfo
 bash /sources/notpm MarkupSafe
 bash /sources/notpm Jinja2
-bash /sources/notpm systemd
+NOT_DIF=".lfs-udev" bash /sources/notpm systemd
 bash /sources/notpm man-db
 bash /sources/notpm procps-ng
 bash /sources/notpm util-linux
