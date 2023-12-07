@@ -1,2 +1,2 @@
-make EFI_LOADER=grubx64.efi
-make install
+make EFIDIR=BOOT EFI_LOADER=grubx64.efi
+make install EFIDIR=BOOT
