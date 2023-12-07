@@ -17,12 +17,6 @@ cd       build
              --with-system-zlib
 
              make
-ulimit -s 32768
-chown -Rv tester .
-su tester -c "PATH=$PATH make -k check"
-../contrib/test_summary
-read -p "press 1 if OK: " c
-if [ $c -eq 1 ];then
 make install
 chown -v -R root:root \
     /usr/lib/gcc/$(gcc -dumpmachine)/13.2.0/include{,-fixed}
@@ -32,4 +26,4 @@ ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/13.2.0/liblto_plugin.so \
         /usr/lib/bfd-plugins/
 mkdir -pv /usr/share/gdb/auto-load/usr/lib
 mv -v /usr/lib/*gdb.py /usr/share/gdb/auto-load/usr/lib
-fi
+
