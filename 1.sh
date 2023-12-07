@@ -73,7 +73,7 @@ bash /sources/notpm make
 bash /sources/notpm patch
 bash /sources/notpm tar
 bash /sources/notpm texinfo
-bash /sources/notpm markupsafe
+bash /sources/notpm MarkupSafe
 bash /sources/notpm jinja2
 bash /sources/notpm systemd
 bash /sources/notpm man-db
