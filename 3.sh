@@ -171,10 +171,6 @@ users:x:999:
 nogroup:x:65534:
 EOF
 
-echo "tester:x:101:101::/home/tester:/bin/bash" >> /etc/passwd
-echo "tester:x:101:" >> /etc/group
-install -o tester -d /home/tester
-exec /usr/bin/bash --login
 touch /var/log/{btmp,lastlog,faillog,wtmp}
 chgrp -v utmp /var/log/lastlog
 chmod -v 664  /var/log/lastlog
@@ -334,15 +330,149 @@ find /usr/lib /usr/libexec -name \*.la -delete
 find /usr -depth -name $(uname -m)-lfs-linux-gnu\* | xargs rm -rf
 
 bash /sources/notpm lfs-bootscripts
-EOF
+bash /usr/lib/udev/init-net-rules.sh
+echo "<lfs>" > /etc/hostname
+cat > /etc/inittab << "EXI"
+# Begin /etc/inittab
 
+id:3:initdefault:
+
+si::sysinit:/etc/rc.d/init.d/rc S
+
+l0:0:wait:/etc/rc.d/init.d/rc 0
+l1:S1:wait:/etc/rc.d/init.d/rc 1
+l2:2:wait:/etc/rc.d/init.d/rc 2
+l3:3:wait:/etc/rc.d/init.d/rc 3
+l4:4:wait:/etc/rc.d/init.d/rc 4
+l5:5:wait:/etc/rc.d/init.d/rc 5
+l6:6:wait:/etc/rc.d/init.d/rc 6
+
+ca:12345:ctrlaltdel:/sbin/shutdown -t1 -a -r now
+
+su:S06:once:/sbin/sulogin
+s1:1:respawn:/sbin/sulogin
+
+1:2345:respawn:/sbin/agetty --noclear tty1 9600
+2:2345:respawn:/sbin/agetty tty2 9600
+3:2345:respawn:/sbin/agetty tty3 9600
+4:2345:respawn:/sbin/agetty tty4 9600
+5:2345:respawn:/sbin/agetty tty5 9600
+6:2345:respawn:/sbin/agetty tty6 9600
+
+# End /etc/inittab
+EXI
+
+cat > /etc/sysconfig/clock << "EXI"
+# Begin /etc/sysconfig/clock
+
+UTC=0
+
+# Set this to any options you might need to give to hwclock,
+# such as machine hardware clock type for Alphas.
+CLOCKPARAMS=
+
+# End /etc/sysconfig/clock
+EXI
+cat > /etc/profile << "EXI"
+# Begin /etc/profile
+
+export LANG=en_SG.UTF-8
+
+# End /etc/profile
+EXI
+
+cat > /etc/inputrc << "EXI"
+# Begin /etc/inputrc
+# Modified by Chris Lynn <roryo@roryo.dynup.net>
+
+# Allow the command prompt to wrap to the next line
+set horizontal-scroll-mode Off
+
+# Enable 8-bit input
+set meta-flag On
+set input-meta On
+
+# Turns off 8th bit stripping
+set convert-meta Off
+
+# Keep the 8th bit for display
+set output-meta On
+
+# none, visible or audible
+set bell-style none
+
+# All of the following map the escape sequence of the value
+# contained in the 1st argument to the readline specific functions
+"\eOd": backward-word
+"\eOc": forward-word
+
+# for linux console
+"\e[1~": beginning-of-line
+"\e[4~": end-of-line
+"\e[5~": beginning-of-history
+"\e[6~": end-of-history
+"\e[3~": delete-char
+"\e[2~": quoted-insert
+
+# for xterm
+"\eOH": beginning-of-line
+"\eOF": end-of-line
+
+# for Konsole
+"\e[H": beginning-of-line
+"\e[F": end-of-line
+
+# End /etc/inputrc
+EXI
+
+cat > /etc/shells << "EXI"
+# Begin /etc/shells
+
+/bin/sh
+/bin/bash
+
+# End /etc/shells
+EXI
+
+cat > /etc/fstab << "EXI"
+# Begin /etc/fstab
+/dev/nvme     /            <fff>       defaults            0     1
+/dev/nvme     /boot         vfat       defaults            0     2
+proc           /proc          proc     nosuid,noexec,nodev 0     0
+sysfs          /sys           sysfs    nosuid,noexec,nodev 0     0
+devpts         /dev/pts       devpts   gid=5,mode=620      0     0
+tmpfs          /run           tmpfs    defaults            0     0
+devtmpfs       /dev           devtmpfs mode=0755,nosuid    0     0
+tmpfs          /dev/shm       tmpfs    nosuid,nodev        0     0
+cgroup2        /sys/fs/cgroup cgroup2  nosuid,noexec,nodev 0     0
+# End /etc/fstab
+EXI
+bash /sources/notpm linux
+echo 12.0 > /etc/lfs-release
+cat > /etc/lsb-release << "EXI"
+DISTRIB_ID="Linux From Scratch"
+DISTRIB_RELEASE="12.0"
+DISTRIB_CODENAME="<your name here>"
+DISTRIB_DESCRIPTION="Linux From Scratch"
+EXI
+
+cat > /etc/os-release << "EXI"
+NAME="Linux From Scratch"
+VERSION="12.0"
+ID=lfs
+PRETTY_NAME="Linux From Scratch 12.0"
+VERSION_CODENAME="<your name here>"
+EXI
+
+EOF
 END
 
+umount -v $LFS/dev/pts
 mountpoint -q $LFS/dev/shm && umount $LFS/dev/shm
-umount $LFS/dev/pts
-umount $LFS/{sys,proc,run,dev}
-cd $LFS
-tar -cpf ~/lfs-temp-tools-12.0.tar .
+umount -v $LFS/dev
+umount -v $LFS/run
+umount -v $LFS/proc
+umount -v $LFS/sys
 
 userdel -r lfs
 [ ! -e /etc/bash.bashrc.NOUSE ] || mv -v /etc/bash.bashrc.NOUSE /etc/bash.bashrc
