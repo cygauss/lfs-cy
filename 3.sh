@@ -13,7 +13,7 @@ mkdir -pv $LFS
 
 mkdir -v $LFS/sources
 chmod -v a+wt $LFS/sources
-cp $LFS_SOURCES/* $LFS/sources
+cp -a $LFS_SOURCES/* $LFS/sources
 echo $MAKEFLAGS > $LFS/sources/makeflags
 chown root:root $LFS/sources/*
 
