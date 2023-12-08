@@ -1,4 +1,4 @@
-make menuconfig
+cp ../.config .config
 make
 make install
 make modules_install
