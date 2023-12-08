@@ -1,6 +1,10 @@
 sed -i -e 's/GROUP="render"/GROUP="video"/' \
        -e 's/GROUP="sgx", //' rules.d/50-udev-default.rules.in
 sed '/systemd-sysctl/s/^/#/' -i rules.d/99-systemd.rules.in
+#patch
+mkdir -p /usr/lib/systemd/network
+cp network/99-default.link /usr/lib/systemd/network/99-default.link
+#patch
 mkdir -p build
 cd       build
 
@@ -42,3 +46,5 @@ sed 's|lib.*udevd|sbin/udevd|'                                        \
   > /usr/share/man/man8/udevd.8
 rm  /usr/share/man/man8/systemd-*.8
 udev-hwdb update
+
+
