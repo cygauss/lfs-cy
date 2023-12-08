@@ -4,6 +4,8 @@ export MAKEFLAGS='-j16'
 #the dir of sources(don't put / at end)
 export LFS_SOURCES=/root/sources
 
+NOT_DIF=".cfg" NOT_SOURCES="/root/sources" bash $LFS_SOURCES/notpm linux
+
 export LFS=/mnt/lfs
 mkdir -pv $LFS
 
