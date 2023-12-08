@@ -438,8 +438,8 @@ EXI
 
 cat > /etc/fstab << "EXI"
 # Begin /etc/fstab
-/dev/nvme     /            <fff>       defaults            0     1
-/dev/nvme     /boot         vfat       defaults            0     2
+/dev/nvme0n1p2     /            ext4       defaults            0     1
+/dev/nvme0n1p1     /boot         vfat       defaults            0     2
 proc           /proc          proc     nosuid,noexec,nodev 0     0
 sysfs          /sys           sysfs    nosuid,noexec,nodev 0     0
 devpts         /dev/pts       devpts   gid=5,mode=620      0     0
@@ -449,6 +449,7 @@ tmpfs          /dev/shm       tmpfs    nosuid,nodev        0     0
 cgroup2        /sys/fs/cgroup cgroup2  nosuid,noexec,nodev 0     0
 # End /etc/fstab
 EXI
+
 bash /sources/notpm linux
 echo 12.0 > /etc/lfs-release
 cat > /etc/lsb-release << "EXI"
