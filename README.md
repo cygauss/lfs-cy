@@ -1,8 +1,8 @@
 # lfs-cy
 
-不分区编译
+实现脚本功能 鲁棒性 不毁坏原系统
 
-完成lfs 加入luet作为pm 调整包选取
+完成lfs init 移植包管理（portage） 调整包选取
 
-clfs 换init 服务器端 openwrt端 桌面端
+clfs 服务器端 openwrt端 桌面端
 
