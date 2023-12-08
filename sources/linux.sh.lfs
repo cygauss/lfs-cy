@@ -1,0 +1,4 @@
+make menuconfig
+make
+make install
+make modules_install
