@@ -15,4 +15,4 @@ mkdir -pv /var/lib/hwclock
                         --host=$LFS_TGT                   \
             --build=$(build-aux/config.guess)
 make
-make install
+make DESTDIR=$LFS install
