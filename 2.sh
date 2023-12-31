@@ -1,68 +1,58 @@
-#the dir of sources(don't put / at end)/root/sources
+#以root将文件放在/usr/sources中
+chmod -v a+wt /usr/sources
 
-#NOT_DIF=".cfg" NOT_SOURCES="/root/sources" bash $LFS_SOURCES/notpm linux
+useradd -s /bin/bash -m -k /dev/null lfs
+#为什么-k /dev/null? https://blog.csdn.net/mjb115889/article/details/82115708
 
-export LFS=/mnt/lfs
-mkdir -pv $LFS
-mkdir -v $LFS/sources
-chmod -v a+wt $LFS/sources
-cp /root/sources/{.,}* $LFS/sources
-chown root:root $LFS/sources/{.,}*
-
-mkdir -p $LFS/{etc,var} $LFS/usr/{bin,lib}
-ln -sv bin $LFS/usr/sbin
-for i in bin lib sbin; do
-  ln -sv usr/$i $LFS/$i
-done
-
-case $(uname -m) in
-  x86_64) ln -sv lib $LFS/usr/lib64
-  ln -sv /usr/lib64 $LFS/lib64 ;;
-esac
-
-mkdir -pv $LFS/tools
-
-groupadd lfs
-useradd -s /bin/bash -g lfs -m -k /dev/null lfs
-
-chown -vR lfs $LFS
-chown -vR root:root $LFS/sources
-
-su - lfs  << "SU"
+[ ! -e /etc/bash.bashrc ] || mv -v /etc/bash.bashrc /etc/bash.bashrc.NOUSE
+su - lfs << "SU"
+#The ' and ' around the END delimiter are important, otherwise things inside the block like for example $(command) will be parsed and executed.
+#https://stackoverflow.com/questions/9712630/what-is-the-difference-between-eof-and-eof-in-shell-heredocs
 
 cat > ~/.bash_profile << "EOF"
 exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash
 EOF
 
+#主要变量在这，LFS_TGT设计为lfs而非pc是为了和build的程序分开且兼容 ''内的$,()会被当字符输出，所以注意makeflags的写法(""不会)
 cat > ~/.bashrc << "EOF"
 set +h
 umask 022
-LFS=/mnt/lfs
+LFS=/home/lfs/lfs
 LC_ALL=POSIX
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 PATH=/usr/bin
 if [ ! -L /bin ]; then PATH=/bin:$PATH; fi
 PATH=$LFS/tools/bin:$PATH
 CONFIG_SITE=$LFS/usr/share/config.site
-export LFS LC_ALL LFS_TGT PATH CONFIG_SITE
+MAKEFLAGS=-j$(cat /proc/cpuinfo | grep 'processor' | wc -l)
+export LFS LC_ALL LFS_TGT PATH CONFIG_SITE MAKEFLAGS
 EOF
 
-[ ! -e /etc/bash.bashrc ] || mv -v /etc/bash.bashrc /etc/bash.bashrc.NOUSE
-exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash << "ENV"
+#source ~/.bash_profile在脚本中不可行， . ~/.bash_profile 虽然可以在当前shell进行，但是因为是在其开了的shell里运行.bashrc导致继续运行脚本时没有正确环境
+#即使如同下一列，也没有读取bashrc 而若执行/bin/bash改成执行bashrc，不仅要解决权限问题，也将无法完成之后命令
+env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash << "ENV"
 . ~/.bashrc
+mkdir -pv $LFS/{etc,var,lib,bin} $LFS/usr $LFS/tools/bin
+ln -sv $LFS/lib $LFS/usr/lib
+ln -sv $LFS/bin $LFS/sbin
+ln -sv $LFS/bin $LFS/usr/bin
+ln -sv $LFS/bin $LFS/usr/sbin
 
-mkdir $LFS/tools/bin
+case $(uname -m) in
+  x86_64) mkdir -pv $LFS/lib64
+  ln -sv $LFS/lib $LFS/lib64
+  ln -sv $LFS/lib $LFS/usr/lib64 ;;
+esac
+
 cat > $LFS/tools/bin/notpm << "EOF"
-pushd $LFS/sources
+pushd /usr/sources
 tar xvf $@*.tar.*
 pushd $@*/
 bash ../$@.sh$NOT_DIF
 popd
 popd
 EOF
-chmod a+x $LFS/tools/bin/notpm
 
-export MAKEFLAGS=-j$(cat /proc/cpuinfo | grep 'processor' | wc -l)
 export NOT_DIF=".cc"
 notpm binutils
 notpm gcc
@@ -74,12 +64,16 @@ export NOT_DIF=".tt"
 for i in m4 ncurses bash coreutils diffutils file findutils gawk grep gzip make patch sed tar xz binutils gcc; do
 notpm $i
 done
+mkdir $LFS/usr
+cp /usr/sources/. $LFS/usr/sources
 
+mv $LFS/tools/bin/notpm $LFS/bin
 ENV
 SU
 [ ! -e /etc/bash.bashrc.NOUSE ] || mv -v /etc/bash.bashrc.NOUSE /etc/bash.bashrc
+export LFS=/root/lfs
+cp -r /home/lfs/lfs /root/lfs
 chown -R root:root $LFS
-
 mkdir -pv $LFS/{dev,proc,sys,run}
 mount -v --bind /dev $LFS/dev
 mount -v --bind /dev/pts $LFS/dev/pts
@@ -97,9 +91,9 @@ chroot "$LFS" /usr/bin/env -i   \
     TERM="$TERM"                \
     PS1='(lfs chroot) \u:\w\$ ' \
     PATH=/usr/bin:/usr/sbin     \
+    MAKEFLAGS=-j$(cat /proc/cpuinfo | grep 'processor' | wc -l) \
     /bin/bash --login << "CHROOT"
-
-mkdir -pv /{boot,home,mnt,opt,srv}
+    mkdir -pv /{boot,home,mnt,opt,srv}
 mkdir -pv /etc/{opt,sysconfig}
 mkdir -pv /lib/firmware
 mkdir -pv /media/{floppy,cdrom}
@@ -116,7 +110,7 @@ install -dv -m 0750 /root
 install -dv -m 1777 /tmp /var/tmp
 ln -sv /proc/self/mounts /etc/mtab
 
-cat > /etc/hosts <<EOF
+cat > /etc/hosts << EOF
 127.0.0.1  localhost $(hostname)
 ::1        localhost
 EOF
@@ -163,10 +157,6 @@ chgrp -v utmp /var/log/lastlog
 chmod -v 664  /var/log/lastlog
 chmod -v 600  /var/log/btmp
 
-mv /tools/bin/notpm /usr/bin
-chmod a+x /usr/bin/notpm
-export MAKEFLAGS=-j$(cat /proc/cpuinfo | grep 'processor' | wc -l)
-export NOT_DIF=".tt"
 for i in gettext bison perl Python texinfo util-linux; do
 notpm $i
 done
@@ -174,6 +164,7 @@ done
 rm -rf /usr/share/{info,man,doc}/*
 find /usr/{lib,libexec} -name \*.la -delete
 rm -rf /tools
+
 CHROOT
 
 mountpoint -q $LFS/dev/shm && umount $LFS/dev/shm

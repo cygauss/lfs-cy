@@ -1,34 +1,42 @@
-#the dir of sources(don't put / at end)/root/sources
-
-#NOT_DIF=".cfg" NOT_SOURCES="/root/sources" bash $LFS_SOURCES/notpm linux
+export MAKEFLAGS='-j16'
+#ensure the partition mkfsed
+export LFS_PART=/dev/nvme0n1p3
+#the dir of sources(don't put / at end)
+export LFS_SOURCES=/root/sources
 
 export LFS=/mnt/lfs
 mkdir -pv $LFS
+
+mount -v $LFS_PART $LFS
+
 mkdir -v $LFS/sources
 chmod -v a+wt $LFS/sources
-cp /root/sources/{.,}* $LFS/sources
-chown root:root $LFS/sources/{.,}*
+cp $LFS_SOURCES/* $LFS/sources
+echo $MAKEFLAGS > $LFS/sources/makeflags
+chown root:root $LFS/sources/*
 
-mkdir -p $LFS/{etc,var} $LFS/usr/{bin,lib}
-ln -sv bin $LFS/usr/sbin
+mkdir -p $LFS/{etc,var} $LFS/usr/{bin,lib,sbin}
+
 for i in bin lib sbin; do
   ln -sv usr/$i $LFS/$i
 done
 
 case $(uname -m) in
-  x86_64) ln -sv lib $LFS/usr/lib64
-  ln -sv /usr/lib64 $LFS/lib64 ;;
+  x86_64) mkdir -pv $LFS/lib64 ;;
 esac
 
 mkdir -pv $LFS/tools
-
 groupadd lfs
 useradd -s /bin/bash -g lfs -m -k /dev/null lfs
 
-chown -vR lfs $LFS
-chown -vR root:root $LFS/sources
+chown -v lfs $LFS/{usr{,/*},lib,var,etc,bin,sbin,tools}
+case $(uname -m) in
+  x86_64) chown -v lfs $LFS/lib64 ;;
+esac
 
-su - lfs  << "SU"
+[ ! -e /etc/bash.bashrc ] || mv -v /etc/bash.bashrc /etc/bash.bashrc.NOUSE
+
+su - lfs  << "END"
 
 cat > ~/.bash_profile << "EOF"
 exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash
@@ -44,42 +52,44 @@ PATH=/usr/bin
 if [ ! -L /bin ]; then PATH=/bin:$PATH; fi
 PATH=$LFS/tools/bin:$PATH
 CONFIG_SITE=$LFS/usr/share/config.site
-export LFS LC_ALL LFS_TGT PATH CONFIG_SITE
+MAKEFLAGS=$(cat /mnt/lfs/sources/makeflags)
+NOT_SOURCES=/mnt/lfs/sources
+export LFS LC_ALL LFS_TGT PATH CONFIG_SITE MAKEFLAGS NOT_SOURCES
 EOF
 
-[ ! -e /etc/bash.bashrc ] || mv -v /etc/bash.bashrc /etc/bash.bashrc.NOUSE
-exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash << "ENV"
+. ~/.bash_profile
+
 . ~/.bashrc
 
-mkdir $LFS/tools/bin
-cat > $LFS/tools/bin/notpm << "EOF"
-pushd $LFS/sources
-tar xvf $@*.tar.*
-pushd $@*/
-bash ../$@.sh$NOT_DIF
-popd
-popd
-EOF
-chmod a+x $LFS/tools/bin/notpm
-
-export MAKEFLAGS=-j$(cat /proc/cpuinfo | grep 'processor' | wc -l)
-export NOT_DIF=".cc"
-notpm binutils
-notpm gcc
-NOT_DIF=".cc-headers" notpm linux
-notpm glibc
-NOT_DIF=".cc-libstdc++" notpm gcc
-
+NOT_DIF=".cc"  bash $LFS/sources/notpm binutils
+NOT_DIF=".cc"  bash $LFS/sources/notpm gcc
+NOT_DIF=".cc-headers" bash $LFS/sources/notpm linux
+NOT_DIF=".cc"  bash $LFS/sources/notpm glibc
+NOT_DIF=".cc-libstdc++"  bash $LFS/sources/notpm gcc
 export NOT_DIF=".tt"
-for i in m4 ncurses bash coreutils diffutils file findutils gawk grep gzip make patch sed tar xz binutils gcc; do
-notpm $i
-done
+bash /mnt/lfs/sources/notpm m4
+bash /mnt/lfs/sources/notpm ncurses
+bash /mnt/lfs/sources/notpm bash
+bash /mnt/lfs/sources/notpm coreutils
+bash /mnt/lfs/sources/notpm diffutils
+bash /mnt/lfs/sources/notpm file
+bash /mnt/lfs/sources/notpm findutils
+bash /mnt/lfs/sources/notpm gawk
+bash /mnt/lfs/sources/notpm grep
+bash /mnt/lfs/sources/notpm gzip
+bash /mnt/lfs/sources/notpm make
+bash /mnt/lfs/sources/notpm patch
+bash /mnt/lfs/sources/notpm sed
+bash /mnt/lfs/sources/notpm tar
+bash /mnt/lfs/sources/notpm xz
+bash /mnt/lfs/sources/notpm binutils
+bash /mnt/lfs/sources/notpm gcc
+END
 
-ENV
-SU
-[ ! -e /etc/bash.bashrc.NOUSE ] || mv -v /etc/bash.bashrc.NOUSE /etc/bash.bashrc
-chown -R root:root $LFS
-
+chown -R root:root $LFS/{usr,lib,var,etc,bin,sbin,tools}
+case $(uname -m) in
+  x86_64) chown -R root:root $LFS/lib64 ;;
+esac
 mkdir -pv $LFS/{dev,proc,sys,run}
 mount -v --bind /dev $LFS/dev
 mount -v --bind /dev/pts $LFS/dev/pts
@@ -97,8 +107,10 @@ chroot "$LFS" /usr/bin/env -i   \
     TERM="$TERM"                \
     PS1='(lfs chroot) \u:\w\$ ' \
     PATH=/usr/bin:/usr/sbin     \
-    /bin/bash --login << "CHROOT"
-
+    MAKEFLAGS="$MAKEFLAGS"      \
+    NOT_DIF=.tt                 \
+    NOT_SOURCES=/sources        \
+   /bin/bash --login << "END"
 mkdir -pv /{boot,home,mnt,opt,srv}
 mkdir -pv /etc/{opt,sysconfig}
 mkdir -pv /lib/firmware
@@ -116,7 +128,7 @@ install -dv -m 0750 /root
 install -dv -m 1777 /tmp /var/tmp
 ln -sv /proc/self/mounts /etc/mtab
 
-cat > /etc/hosts <<EOF
+cat > /etc/hosts << "EOF"
 127.0.0.1  localhost $(hostname)
 ::1        localhost
 EOF
@@ -158,24 +170,31 @@ users:x:999:
 nogroup:x:65534:
 EOF
 
+echo "tester:x:101:101::/home/tester:/bin/bash" >> /etc/passwd
+echo "tester:x:101:" >> /etc/group
+install -o tester -d /home/tester
+exec /usr/bin/bash --login
 touch /var/log/{btmp,lastlog,faillog,wtmp}
 chgrp -v utmp /var/log/lastlog
 chmod -v 664  /var/log/lastlog
 chmod -v 600  /var/log/btmp
 
-mv /tools/bin/notpm /usr/bin
-chmod a+x /usr/bin/notpm
-export MAKEFLAGS=-j$(cat /proc/cpuinfo | grep 'processor' | wc -l)
-export NOT_DIF=".tt"
-for i in gettext bison perl Python texinfo util-linux; do
-notpm $i
-done
-
+bash /sources/notpm gettext
+bash /sources/notpm bison
+bash /sources/notpm perl
+bash /sources/notpm Python
+bash /sources/notpm texinfo
+bash /sources/notpm util-linux
 rm -rf /usr/share/{info,man,doc}/*
 find /usr/{lib,libexec} -name \*.la -delete
 rm -rf /tools
-CHROOT
+END
 
 mountpoint -q $LFS/dev/shm && umount $LFS/dev/shm
 umount $LFS/dev/pts
 umount $LFS/{sys,proc,run,dev}
+cd $LFS
+tar -cpf ~/lfs-temp-tools-12.0.tar .
+
+userdel -r lfs
+[ ! -e /etc/bash.bashrc.NOUSE ] || mv -v /etc/bash.bashrc.NOUSE /etc/bash.bashrc
