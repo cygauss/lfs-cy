@@ -1,5 +1,7 @@
 ./configure --prefix=/usr   \
             --enable-shared \
-            --without-ensurepip
+            --without-ensurepip \
+                        --host=$LFS_TGT                   \
+            --build=$(build-aux/config.guess)
             make
 make install
