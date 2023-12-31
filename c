@@ -55,7 +55,7 @@ popd
 EOF
 
 /bin/bash << "BASH"
-for i in binutils gcc linux glibc gcc m4 ncurses bash coreutils diffutils file findutils gawk grep gzip make patch sed tar xz binutils gcc util grub linux gettext bison perl python texinfo; do
+for i in binutils gcc linux glibc gcc m4 ncurses bash coreutils diffutils file findutils gawk grep gzip make patch sed tar xz binutils gcc grub linux gettext bison perl python texinfo util iproute2; do
 if [ -z ${!i} ] ;then
 export $i=1
 else
