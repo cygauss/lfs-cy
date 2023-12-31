@@ -7,6 +7,8 @@ sh Configure -des                                        \
              -Dsitelib=/usr/lib/perl5/5.38/site_perl     \
              -Dsitearch=/usr/lib/perl5/5.38/site_perl    \
              -Dvendorlib=/usr/lib/perl5/5.38/vendor_perl \
-             -Dvendorarch=/usr/lib/perl5/5.38/vendor_perl
+             -Dvendorarch=/usr/lib/perl5/5.38/vendor_perl \
+                         --host=$LFS_TGT                   \
+            --build=$(build-aux/config.guess)
 make
 make install
