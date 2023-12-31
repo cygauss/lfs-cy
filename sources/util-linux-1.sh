@@ -11,6 +11,8 @@ mkdir -pv /var/lib/hwclock
             --disable-runuser    \
             --disable-pylibmount \
             --disable-static     \
-            --without-python
+            --without-python     \
+                        --host=$LFS_TGT                   \
+            --build=$(build-aux/config.guess)
 make
 make install
