@@ -1,0 +1,35 @@
+patch -Np1 -i ../bzip2-1.0.8-install_docs-1.patch
+以下命令保证安装的符号链接是相对的：
+
+sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
+确保 man 页面被安装到正确位置：
+
+sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" Makefile
+执行以下命令，准备编译 Bzip2：
+
+make -f Makefile-libbz2_so
+make clean
+make 命令参数的含义：
+
+-f Makefile-libbz2_so
+该选项使用一个不同的 Makefile 文件构建 Bzip2，对于我们的例子来说就是使用 Makefile-libbz2_so 文件。它创建一个共享库 libbz2.so，并将 Bzip2 工具链接到这个库。
+
+编译并测试该软件包：
+
+make
+安装软件包中的程序：
+
+make PREFIX=/usr install
+安装共享库：
+
+cp -av libbz2.so.* /usr/lib
+ln -sv libbz2.so.1.0.8 /usr/lib/libbz2.so
+安装链接到共享库的 bzip2 二进制程序到 /bin 目录，并将两个和 bzip2 完全相同的文件替换成符号链接：
+
+cp -v bzip2-shared /usr/bin/bzip2
+for i in /usr/bin/{bzcat,bunzip2}; do
+  ln -sfv bzip2 $i
+done
+删除无用的静态库：
+
+rm -fv /usr/lib/libbz2.a

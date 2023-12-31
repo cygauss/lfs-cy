@@ -1,0 +1,4 @@
+cp ../use.config .config
+make
+make install
+make modules_install
