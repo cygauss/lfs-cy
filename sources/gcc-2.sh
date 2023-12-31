@@ -7,7 +7,7 @@ cd       build
     --disable-multilib              \
     --disable-nls                   \
     --disable-libstdcxx-pch         \
-    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/$VERGCC
+    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/13.2.0
  make
   make DESTDIR=$LFS install
   rm -v $LFS/usr/lib/lib{stdc++,stdc++fs,supc++}.la
