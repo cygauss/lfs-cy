@@ -48,7 +48,7 @@ cat > $LFS/tools/bin/notpm << "EOF"
 pushd $LFS/sources
 tar xvf ${i}*.tar.*
 pushd $i*/
-bash ../${i}-${!i}.sh
+bash ../${i}*-${!i}.sh
 popd
 rm -rf $i*/
 popd
