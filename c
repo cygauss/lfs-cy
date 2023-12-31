@@ -46,9 +46,9 @@ env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash << "ENV"
 
 cat > $LFS/tools/bin/notpm << "EOF"
 pushd $LFS/sources
-tar xvf $i*.tar.*
+tar xvf ${i}*.tar.*
 pushd $i*/
-bash ../$i${!i}.sh
+bash ../${i}-${!i}.sh
 popd
 rm -rf $i*/
 popd
