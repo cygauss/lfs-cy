@@ -1,5 +1,0 @@
-sed -i 's/extras//' Makefile.in
-./configure --prefix=/usr
-make
-make LN='ln -f' install
-ln -sv gawk.1 /usr/share/man/man1/awk.1
