@@ -2,7 +2,7 @@ mkdir -pv /var/lib/hwclock
 ./configure ADJTIME_PATH=/var/lib/hwclock/adjtime    \
             --libdir=/usr/lib    \
             --runstatedir=/run   \
-            --docdir=/usr/share/doc/util-linux-2.39.1 \
+            --docdir=/usr/share/doc/util-linux-${VERUL} \
             --disable-chfn-chsh  \
             --disable-login      \
             --disable-nologin    \
