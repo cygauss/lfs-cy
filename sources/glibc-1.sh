@@ -12,7 +12,7 @@ echo "rootsbindir=/usr/bin" > configparms
       --prefix=/usr                      \
       --host=$LFS_TGT                    \
       --build=$(../scripts/config.guess) \
-      --enable-kernel=$VERKER               \
+      --enable-kernel=6.6.8              \
       --with-headers=$LFS/usr/include    \
       --disable-nscd \
       libc_cv_slibdir=/usr/lib
