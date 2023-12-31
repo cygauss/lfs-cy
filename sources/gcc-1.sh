@@ -15,7 +15,7 @@ cd       build
 ../configure                  \
     --target=$LFS_TGT         \
     --prefix=$LFS/tools       \
-    --with-glibc-version=$VERLIB \
+    --with-glibc-version=2.38 \
     --with-sysroot=$LFS       \
     --with-newlib             \
     --without-headers         \
