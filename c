@@ -2,16 +2,7 @@ export LFS=/mnt/lfs
 mkdir -pv $LFS
 mkdir -v $LFS/sources
 chmod -v a+wt $LFS/sources
-#download tars patches shes and one .config
-
-pushd $LFS/sources
-  tar xvf linux*tar
-pushd linux*/
-  make menuconfig
-cp .config ../use.config
-  popd ..
-  popd ..
-  
+#download tars patches shes and one linux.config named
 chown -R root:root $LFS/sources
 mkdir -pv $LFS/{boot,etc,var} $LFS/usr/{bin,lib}
 ln -sv bin $LFS/usr/sbin
