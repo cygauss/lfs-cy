@@ -1,0 +1,14 @@
+
+!有不与原书兼容的修改 ？有需要测试 
+!glibc-1.sh
+gcc-1.sh
+gcc-2.sh
+bison-1.sh
+grub-1.sh
+!?iproute2-1.sh
+perl-1.sh
+util-linux
+xz
+!linux-2
+!coreutils
+util-linux
