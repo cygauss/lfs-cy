@@ -66,6 +66,11 @@ export i
 notpm
 done
 BASH
+ENV
+SU
+
+
+
 
 
 
