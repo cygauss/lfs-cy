@@ -68,7 +68,7 @@ done
 BASH
 ENV
 SU
-
+[ ! -e /etc/bash.bashrc.NOUSE ] || mv -v /etc/bash.bashrc.NOUSE /etc/bash.bashrc
 
 
 
