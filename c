@@ -49,22 +49,20 @@ cat > $LFS/tools/bin/notpm << "EOF"
 pushd $LFS/sources
 tar xvf ${i}*.tar.*
 pushd $i*/
-bash ../${i}-${!i}.sh
+bash ../${i}*-${!i}.sh
 popd
 rm -rf $i*/
 popd
 EOF
 
 /bin/bash << "BASH"
-for i in binutils gcc linux glibc gcc m4 ncurses bash coreutils diffutils file findutils gawk grep gzip make patch sed tar xz binutils gcc linux gettext bison perl python texinfo util; do
+for i in binutils gcc grub linux glibc gcc m4 ncurses bash coreutils diffutils file findutils gawk grep gzip make patch sed tar xz binutils gcc linux gettext bison perl Python texinfo util; do
 if [ -z ${!i} ] ;then
 export $i=1
 else
 export $i=$((${!i}+1))
 fi
-if [ $i== 'util' ] ; then
-i="util-linux"
-fi
+export i
 notpm
 done
 BASH
